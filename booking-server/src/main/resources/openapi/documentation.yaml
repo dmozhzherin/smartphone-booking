@@ -1,0 +1,160 @@
+openapi: "3.0.3"
+info:
+  title: "Application API"
+  description: "Application API"
+  version: "0.1.0"
+servers:
+  - url: "http://0.0.0.0:8080"
+paths:
+  /phones:
+    get:
+      description: "Get all phones"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Smartphone"
+
+  /bookings:
+    get:
+      description: "Get all bookings"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Booking"
+
+    post:
+      description: "Create a booking"
+      security:
+        - basicAuth: []
+      requestBody:
+        description: "Booking to create"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Booking"
+      responses:
+        "201":
+          description: "Created"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "409":
+          description: "Conflict"
+
+  /bookings/{id}:
+    get:
+      description: "Get booking details"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "Booking ID"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+        "404":
+          description: "Not Found"
+    delete:
+      description: "Delete a booking"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "Booking ID"
+          required: true
+          schema:
+            type: "string"
+            format: "uuid"
+      responses:
+        "204":
+          description: "No Content"
+        "404":
+          description: "Not Found"
+
+
+components:
+  schemas:
+    Smartphone:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          required: true
+        manufacturer:
+          type: "string"
+          required: true
+        model:
+          type: "string"
+          required: true
+        bands2g:
+          type: "string"
+        bands3g:
+          type: "string"
+        bands4g:
+          type: "string"
+        available:
+          type: "boolean"
+          required: true
+        booked_by:
+          type: "string"
+        booked_at:
+          type: "string"
+          format: "date-time"
+          description: "UTC ISO 8601 date-time format"
+
+    Booking:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          readOnly: true
+          required: true
+        phone_guid:
+          type: "string"
+          format: "uuid"
+          required: true
+        manufacturer:
+          type: "string"
+          required: true
+          readOnly: true
+        model:
+          type: "string"
+          required: true
+          readOnly: true
+        booked_by:
+          type: "string"
+          readOnly: true
+        booked_by_name:
+          type: "string"
+          readOnly: true
+        booked_at:
+          type: "string"
+          format: "date-time"
+          readOnly: true
+          description: "UTC ISO 8601 date-time format"
+
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: "Basic authentication"
